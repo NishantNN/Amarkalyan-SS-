@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Images</title>
+  <style>
+    :root {
+      --bg-color: #f5f7fa;
+      --text-color: #333;
+      --card-bg: #ffffff;
+      --btn-bg: #00c6ff;
+      --btn-hover: #009cd8;
+      --success-bg: #28a745;
+      --danger-bg: #dc3545;
+      --nav-bg: #1e1e2f;
+      --nav-text: #ffffff;
+      --nav-hover: #00c6ff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: white;
+    }
+
+    ul .active a {
+      text-shadow: 2px 2px red;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: var(--nav-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 60px;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-item {
+      color: var(--nav-text);
+      cursor: pointer;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-item:hover {
+      transform: scale(1.1);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .hamburger span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      border-radius: 5px;
+      transition: 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: var(--nav-bg);
+        flex-direction: column;
+        width: 100%;
+        display: none;
+        padding: 1rem 0;
+      }
+
+      .nav-links.active {
+        display: flex;
+        animation: fadeIn 0.3s ease forwards;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    .form-container {
+      background-color: var(--card-bg);
+      padding: 30px;
+      max-width: 800px;
+      position: relative;
+      top: 4rem;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .form-title,
+    .gallery-title {
+      font-size: 24px;
+      margin: 30px 0 20px;
+      text-align: center;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--btn-bg);
+      box-shadow: 0 0 6px rgba(0,198,255,0.3);
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: var(--btn-bg);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--btn-hover);
+      transform: scale(1.05);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .gallery-item {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      padding: 10px;
+      transition: transform 0.3s ease;
+      max-width: 350px;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .description {
+      padding: 10px;
+      font-size: 14px;
+      color: var(--text-color);
+      transition: all 0.2s ease;
+    }
+
+    .edit-delete-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .edit-button {
+      background-color: var(--success-bg);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .delete-button {
+      background-color: var(--danger-bg);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .pagination {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .pagination button {
+      margin: 4px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: none;
+      background-color: #ddd;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .pagination button:hover {
+      background-color: var(--btn-hover);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo">Amarkalyan Admin</div>
+    <ul class="nav-links" id="navLinks">
+      <li class="nav-item"><a href="upload_notices.html">Notices</a></li>
+      <li class="nav-item"><a href="upload_staff.html">Staff</a></li>
+      <li class="nav-item active"><a href="upload_media.html">Media</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <div class="form-container">
+    <h3 class="form-title">Upload an Image</h3>
+    <input type="file" id="image-upload" accept="image/*">
+    <textarea id="image-desc" placeholder="Enter a short description"></textarea>
+    <button id="upload-button">Upload Image</button>
+  </div>
+
+  <h3 class="gallery-title">Gallery</h3>
+  <div id="gallery" class="gallery"></div>
+
+  <div class="pagination" id="pagination"></div>
+
+  <script type="module">
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('active');
+    });
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+    import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDOskGbmFVPlHml61_SeUxNSHPDby5wUGc",
+      authDomain: "amarkalyan-admin.firebaseapp.com",
+      databaseURL: "https://amarkalyan-admin-default-rtdb.firebaseio.com",
+      projectId: "amarkalyan-admin",
+      storageBucket: "amarkalyan-admin.appspot.com",
+      messagingSenderId: "1040534177674",
+      appId: "1:1040534177674:web:51b1f85fd85e33a53daa73"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    const imagesRef = ref(db, "gallery");
+
+    let allImages = [];
+    let currentPage = 1;
+    const imagesPerPage = 12;
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        displayImages();
+      }
+    });
+
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "Amarkalyan");
+
+      const response = await fetch("https://api.cloudinary.com/v1_1/dsrl6ep9l/image/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      return data.secure_url;
+    }
+
+    async function uploadImage() {
+      const file = document.getElementById("image-upload").files[0];
+      const description = document.getElementById("image-desc").value;
+
+      if (!file || !description) {
+        alert("Please select an image and enter a description!");
+        return;
+      }
+
+      const imageUrl = await uploadToCloudinary(file);
+      const newImageKey = Date.now();
+
+      set(ref(db, "gallery/" + newImageKey), {
+        ImageUrl: imageUrl,
+        Description: description,
+        Timestamp: newImageKey
+      }).then(() => {
+        document.getElementById("image-upload").value = "";
+        document.getElementById("image-desc").value = "";
+        displayImages();
+      });
+    }
+
+    function displayImages() {
+      get(imagesRef).then((snapshot) => {
+        if (!snapshot.exists()) return;
+        allImages = Object.values(snapshot.val()).sort((a, b) => b.Timestamp - a.Timestamp);
+        renderPage();
+      });
+    }
+
+    function renderPage() {
+      const gallery = document.getElementById("gallery");
+      gallery.innerHTML = "";
+
+      const start = (currentPage - 1) * imagesPerPage;
+      const paginatedImages = allImages.slice(start, start + imagesPerPage);
+
+      paginatedImages.forEach(image => {
+        const item = document.createElement("div");
+        item.classList.add("gallery-item");
+
+        const img = document.createElement("img");
+        img.src = image.ImageUrl;
+
+        const desc = document.createElement("div");
+        desc.classList.add("description");
+        desc.textContent = image.Description;
+        desc.setAttribute("contenteditable", "true");
+
+        const buttons = document.createElement("div");
+        buttons.classList.add("edit-delete-buttons");
+
+        const editButton = document.createElement("button");
+        editButton.classList.add("edit-button");
+        editButton.textContent = "Save";
+        editButton.onclick = () => update(ref(db, "gallery/" + image.Timestamp), { Description: desc.textContent });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete-button");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = () => {
+          if (confirm("Are you sure you want to delete this image?")) {
+            remove(ref(db, "gallery/" + image.Timestamp)).then(() => displayImages());
+          }
+        };
+
+        buttons.appendChild(editButton);
+        buttons.appendChild(deleteButton);
+        item.appendChild(img);
+        item.appendChild(desc);
+        item.appendChild(buttons);
+        gallery.appendChild(item);
+      });
+
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(allImages.length / imagesPerPage);
+      const paginationContainer = document.getElementById("pagination");
+      paginationContainer.innerHTML = "";
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) {
+          btn.style.backgroundColor = "var(--btn-bg)";
+          btn.style.color = "white";
+        }
+        btn.onclick = () => {
+          currentPage = i;
+          renderPage();
+        };
+        paginationContainer.appendChild(btn);
+      }
+    }
+
+    document.getElementById("upload-button").addEventListener("click", uploadImage);
+  </script>
+</body>
+</html>

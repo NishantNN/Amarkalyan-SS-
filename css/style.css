@@ -633,10 +633,10 @@ pre code {
 }
 
 .row {
-  display: flex;
-  flex-wrap: wrap;
-  margin-right: -15px;
-  margin-left: -15px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
 }
 
 .no-gutters {
@@ -9957,4 +9957,120 @@ h6,
 
 .testimonial-carousel .owl-nav .owl-prev:hover {
   background: #2878EB;
+}
+
+
+
+/* notices  */
+
+.notice-container {
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notice-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.notice-desc {
+  font-size: 16px;
+  color: #555;
+}
+
+.notice-time {
+  font-size: 14px;
+  color: #888;
+  margin-top: 10px;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+  justify-content: center;
+}
+
+.pagination button {
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+}
+
+.pg_active {
+  background-color: black; 
+  color: red;
+  font-weight: bold;
+}
+
+
+
+/* staff  */
+
+.staff-list {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.staff-item {
+  background-color: #fff;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 80vw;
+  display: flex;
+  justify-content:center;
+  align-items: center;
+}
+
+.staff-item img {
+  width: 100px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.staff-info {
+  display: inline-block;
+  vertical-align: top;
+  width: 500px;
+}
+
+.staff-info h3 {
+  margin: 0;
+  color: #333;
+}
+
+.staff-info p {
+  color: #666;
+}
+
+.pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 10px 15px;
+  margin: 0 5px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.pagination button:hover {
+  background-color: #45a049;
 }
