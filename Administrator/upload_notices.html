@@ -117,11 +117,11 @@
       padding: 30px;
       max-width: 800px;
       position: relative;
-      top: 4rem;
+      top: 1rem;
       margin: 0 auto 30px auto;
       border-radius: 12px;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      text-align: center;
+      text-align: left;
       animation: fadeIn 0.5s ease;
     }
 
@@ -298,8 +298,15 @@
     <input type="file" id="pdf-upload" accept="application/pdf" />
     <button id="upload-button">Upload Notice</button>
   </div>
-
-  <h3 class="section-heading">Notices</h3>
+  <div class="form-container">
+    <h3 class="form-heading">Upload Banner Notice</h3>
+    <input type="text" id="banner-title" placeholder="Enter Banner Title" />
+    <textarea id="banner-desc" placeholder="Enter Banner Description"></textarea>
+    <button id="banner-upload-button">Upload Banner</button>
+  </div>
+  
+  <h3 class="section-heading">Banner Notice</h3>
+  <div id="banner-notice-container" class="form-container" style="margin-bottom: 50px;"></div>
   <div id="notices-list"></div>
   <div id="pagination" class="pagination"></div>
 
@@ -500,6 +507,77 @@
     }
   
     document.getElementById("upload-button").addEventListener("click", uploadNotice);
+    document.getElementById("banner-upload-button").addEventListener("click", uploadBannerNotice);
+
+const bannerRef = ref(db, "banner_notice");
+
+function uploadBannerNotice() {
+  const title = document.getElementById("banner-title").value.trim();
+  const desc = document.getElementById("banner-desc").value.trim();
+  const timestamp = new Date().toISOString();
+
+  if (!title || !desc) {
+    alert("Banner title and description required.");
+    return;
+  }
+
+  set(bannerRef, {
+    Title: title,
+    Description: desc,
+    Timestamp: timestamp
+  }).then(() => {
+    document.getElementById("banner-title").value = "";
+    document.getElementById("banner-desc").value = "";
+    displayBannerNotice();
+  });
+}
+
+function displayBannerNotice() {
+  get(bannerRef).then(snapshot => {
+    const container = document.getElementById("banner-notice-container");
+    container.innerHTML = "";
+    if (!snapshot.exists()) {
+      container.innerHTML = "<p style='text-align:center;'>No banner notice uploaded.</p>";
+      return;
+    }
+
+    const data = snapshot.val();
+
+    const title = document.createElement("div");
+    title.className = "notice-title";
+    title.contentEditable = true;
+    title.textContent = data.Title;
+
+    const desc = document.createElement("div");
+    desc.className = "notice-desc";
+    desc.contentEditable = true;
+    desc.textContent = data.Description;
+
+    const time = document.createElement("div");
+    time.className = "notice-time";
+    time.textContent = `Posted on: ${new Date(data.Timestamp).toLocaleString()}`;
+
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "edit-button";
+    saveBtn.textContent = "Save Changes";
+    saveBtn.onclick = () => {
+      update(bannerRef, {
+        Title: title.textContent,
+        Description: desc.textContent
+      }).then(() => displayBannerNotice());
+    };
+
+    container.append(title, desc, time, saveBtn);
+  });
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) window.location.href = "login.html";
+  else {
+    displayNotices();
+    displayBannerNotice(); // show banner on load
+  }
+});
   </script>
   </body>
 </html>

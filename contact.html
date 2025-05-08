@@ -48,14 +48,45 @@
             </div>
         </div>
         <!-- Topbar End -->
+    <!-- Moving Notice Banner Start -->
+<!-- Moving Notice Banner (Firebase) -->
+  <div class="_amarkalyanNoticeBanner_32sd9gfh bg-primary text-white py-2">
+    <div class="container-fluid">
+      <div class="position-relative overflow-hidden" style="height: 30px;">
+        <div id="notice-marquee" class="position-absolute w-100" style="white-space: nowrap; animation: slideNotice 20s linear infinite;">
+          <!-- Firebase Notices Will Be Injected Here -->
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Moving Notice Banner End -->
+<style>
+    @keyframes slideNotice {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
     
-
+    ._amarkalyanNoticeBanner_32sd9gfh span {
+        font-weight: 600;
+        font-size: 16px;
+    }
+    
+    @media (max-width: 576px) {
+        ._amarkalyanNoticeBanner_32sd9gfh span {
+            font-size: 14px;
+        }
+    }
+    .navbar-brand img{
+        width: 100px;
+    }
+    </style>
 
     <!-- Navbar Start -->
     <div class="container-fluid p-0">
         <nav class="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0 px-lg-5">
             <a href="index.html" class="navbar-brand ml-lg-3">
-                <h1 class="m-0 text-uppercase text-primary"><i class="fa fa-book-reader mr-3"></i>Amarkalyan</h1>
+                <img src="/img/about.png" alt="school logo">
+                <!-- <h1 class="m-0 text-uppercase text-primary"><i class="fa fa-book-reader mr-3"></i>Amarkalyan</h1> -->
             </a>
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
@@ -196,6 +227,73 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+      
+        const firebaseConfig = {
+          apiKey: "AIzaSyDOskGbmFVPlHml61_SeUxNSHPDby5wUGc",
+          authDomain: "amarkalyan-admin.firebaseapp.com",
+          databaseURL: "https://amarkalyan-admin-default-rtdb.firebaseio.com",
+          projectId: "amarkalyan-admin",
+          storageBucket: "amarkalyan-admin.appspot.com",
+          messagingSenderId: "1040534177674",
+          appId: "1:1040534177674:web:51b1f85fd85e33a53daa73"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const bannerRef = ref(db, "banner_notice");
+      
+        // Function to display the banner
+        function displayBanner() {
+          // Wait until the DOM is fully loaded before executing
+          document.addEventListener("DOMContentLoaded", () => {
+            const marqueeContainer = document.getElementById("notice-marquee");
+      
+            if (!marqueeContainer) {
+              console.error("Element with ID 'notice-marquee' not found.");
+              return;
+            }
+      
+            // Clear any existing content
+            marqueeContainer.innerHTML = "";
+      
+            // Fetch the banner data from Firebase
+            get(bannerRef)
+              .then((snapshot) => {
+                if (snapshot.exists()) {
+                  const data = snapshot.val();
+                  const bannerTitle = data.Title;
+                  const bannerDesc = data.Description;
+      
+                  // Create a new span element for the banner notice
+                  const bannerElement = document.createElement("span");
+                  bannerElement.className = "banner-item";
+      
+                  // Add the title and description in the span
+                  bannerElement.innerHTML = `<strong>${bannerTitle}:</strong> ${bannerDesc}`;
+      
+                  // Append the banner element to the marquee container
+                  marqueeContainer.appendChild(bannerElement);
+                } else {
+                  // Display message if no banner is available in Firebase
+                  marqueeContainer.innerHTML = "<p>No banner notice uploaded.</p>";
+                }
+              })
+              .catch((error) => {
+                console.error("Error fetching banner notice:", error);
+                marqueeContainer.innerHTML = "<p>Failed to load banner notice.</p>";
+              });
+          });
+        }
+      
+        // Call the displayBanner function to show the banner on page load
+        displayBanner();
+      </script>
+
+
 </body>
 
 </html>

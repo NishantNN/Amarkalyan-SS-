@@ -15,6 +15,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebas
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const noticesRef = ref(db, 'notice');
+  const bannerRef = ref(db, "banner_notice");
   
   let noticesArray = [];
   const noticesPerPage = 5;
@@ -78,6 +79,52 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebas
       pagination.appendChild(btn);
     }
   }
+   // Function to display the banner
+   function displayBanner() {
+    // Wait until the DOM is fully loaded before executing
+    document.addEventListener("DOMContentLoaded", () => {
+      const marqueeContainer = document.getElementById("notice-marquee");
+
+      if (!marqueeContainer) {
+        console.error("Element with ID 'notice-marquee' not found.");
+        return;
+      }
+
+      // Clear any existing content
+      marqueeContainer.innerHTML = "";
+
+      // Fetch the banner data from Firebase
+      get(bannerRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            const bannerTitle = data.Title;
+            const bannerDesc = data.Description;
+
+            // Create a new span element for the banner notice
+            const bannerElement = document.createElement("span");
+            bannerElement.className = "banner-item";
+
+            // Add the title and description in the span
+            bannerElement.innerHTML = `<strong>${bannerTitle}:</strong> ${bannerDesc}`;
+
+            // Append the banner element to the marquee container
+            marqueeContainer.appendChild(bannerElement);
+          } else {
+            // Display message if no banner is available in Firebase
+            marqueeContainer.innerHTML = "<p>No banner notice uploaded.</p>";
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching banner notice:", error);
+          marqueeContainer.innerHTML = "<p>Failed to load banner notice.</p>";
+        });
+    });
+  }
+
+  // Call the displayBanner function to show the banner on page load
+  displayBanner();
+
   
   // Run on page load
   fetchNotices();

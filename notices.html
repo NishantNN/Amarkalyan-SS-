@@ -68,16 +68,48 @@
       </div>
     </div>
     <!-- Topbar End -->
-
+<!-- Moving Notice Banner Start -->
+<!-- Moving Notice Banner (Firebase) -->
+<div class="_amarkalyanNoticeBanner_32sd9gfh bg-primary text-white py-2">
+  <div class="container-fluid">
+    <div class="position-relative overflow-hidden" style="height: 30px;">
+      <div id="notice-marquee" class="position-absolute w-100" style="white-space: nowrap; animation: slideNotice 20s linear infinite;">
+        <!-- Firebase Notices Will Be Injected Here -->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Moving Notice Banner End -->
+<style>
+  @keyframes slideNotice {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+  }
+  
+  ._amarkalyanNoticeBanner_32sd9gfh span {
+      font-weight: 600;
+      font-size: 16px;
+  }
+  
+  @media (max-width: 576px) {
+      ._amarkalyanNoticeBanner_32sd9gfh span {
+          font-size: 14px;
+      }
+  }
+ .navbar-brand img{
+        width: 100px;
+    }
+  </style>
     <!-- Navbar Start -->
     <div class="container-fluid p-0">
       <nav
         class="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0 px-lg-5"
       >
         <a href="index.html" class="navbar-brand ml-lg-3">
-          <h1 class="m-0 text-uppercase text-primary">
+          <img src="/img/about.png" alt="school logo">
+          <!-- <h1 class="m-0 text-uppercase text-primary">
             <i class="fa fa-book-reader mr-3"></i>Amarkalyan
-          </h1>
+          </h1> -->
         </a>
         <button
           type="button"
