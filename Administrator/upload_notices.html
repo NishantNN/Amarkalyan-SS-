@@ -307,11 +307,11 @@
     const hamburger = document.getElementById("hamburger");
     const navLinks = document.getElementById("navLinks");
     hamburger.addEventListener("click", () => navLinks.classList.toggle("active"));
-
+  
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-
+  
     const firebaseConfig = {
       apiKey: "AIzaSyDOskGbmFVPlHml61_SeUxNSHPDby5wUGc",
       authDomain: "amarkalyan-admin.firebaseapp.com",
@@ -321,40 +321,43 @@
       messagingSenderId: "1040534177674",
       appId: "1:1040534177674:web:51b1f85fd85e33a53daa73"
     };
-
+  
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const auth = getAuth(app);
     const noticesRef = ref(db, "notice");
-
+  
     onAuthStateChanged(auth, (user) => {
       if (!user) window.location.href = "login.html";
       else displayNotices();
     });
-
+  
     async function uploadPDFToCloudinary(file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "Amarkalyan");
-      formData.append("folder", "notices_pdfs");
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "Amarkalyan");
+  formData.append("folder", "notices_pdfs");
 
-      const response = await fetch("https://api.cloudinary.com/v1_1/dsrl6ep9l/raw/upload", {
-        method: "POST", body: formData
-      });
-      const data = await response.json();
-      return `https://res-console.cloudinary.com/dsrl6ep9l/media_explorer_thumbnails/${data.asset_id}/download`;
-    }
+  const response = await fetch("https://api.cloudinary.com/v1_1/dsrl6ep9l/raw/upload", {
+    method: "POST",
+    body: formData
+  });
 
+  const data = await response.json();
+  // Force PDF to be downloaded with the filename prefix "notice_"
+  return data.secure_url.replace("/upload/", "/upload/fl_attachment:notice_");
+}
+  
     async function uploadNotice() {
       const title = document.getElementById("notice-title").value;
       const description = document.getElementById("notice-desc").value;
       const pdfFile = document.getElementById("pdf-upload").files[0];
-
+  
       if (title && description) {
         const key = Date.now();
         const timestamp = new Date().toISOString();
         let pdfUrl = "";
-
+  
         if (pdfFile) {
           try {
             pdfUrl = await uploadPDFToCloudinary(pdfFile);
@@ -363,36 +366,41 @@
             return;
           }
         }
-
+  
         set(ref(db, "notice/" + key), {
-          Title: title, Description: description, Timestamp: timestamp, PDFUrl: pdfUrl
+          Title: title,
+          Description: description,
+          Timestamp: timestamp,
+          PDFUrl: pdfUrl
         }).then(() => {
           clearForm();
           displayNotices();
         });
-      } else alert("Title and Description are required.");
+      } else {
+        alert("Title and Description are required.");
+      }
     }
-
+  
     function clearForm() {
       document.getElementById("notice-title").value = "";
       document.getElementById("notice-desc").value = "";
       document.getElementById("pdf-upload").value = "";
     }
-
+  
     function displayNotices() {
       get(noticesRef).then(snapshot => {
         const noticesList = document.getElementById("notices-list");
         const pagination = document.getElementById("pagination");
         noticesList.innerHTML = "";
         pagination.innerHTML = "";
-
+  
         if (snapshot.exists()) {
           const data = snapshot.val();
           const entries = Object.entries(data).sort((a, b) => b[0] - a[0]);
           const noticesPerPage = 5;
           const totalPages = Math.ceil(entries.length / noticesPerPage);
           let currentPage = 1;
-
+  
           function renderPage(page) {
             noticesList.innerHTML = "";
             const start = (page - 1) * noticesPerPage;
@@ -400,17 +408,17 @@
             entries.slice(start, end).forEach(([key, value]) => createNoticeElement(key, value));
             renderPagination(page);
           }
-
+  
           function renderPagination(current) {
             pagination.innerHTML = "";
-
+  
             if (current > 1) {
               const prev = document.createElement("button");
               prev.textContent = "⟨";
               prev.onclick = () => renderPage(current - 1);
               pagination.appendChild(prev);
             }
-
+  
             for (let i = 1; i <= totalPages; i++) {
               const btn = document.createElement("button");
               btn.textContent = i;
@@ -418,7 +426,7 @@
               btn.onclick = () => renderPage(i);
               pagination.appendChild(btn);
             }
-
+  
             if (current < totalPages) {
               const next = document.createElement("button");
               next.textContent = "⟩";
@@ -426,45 +434,45 @@
               pagination.appendChild(next);
             }
           }
-
+  
           renderPage(currentPage);
         } else {
           noticesList.innerHTML = "<p style='text-align:center;'>No notices available.</p>";
         }
       });
     }
-
+  
     function createNoticeElement(key, notice) {
       const container = document.createElement("div");
       container.className = "notice-item";
-
+  
       const title = document.createElement("div");
       title.className = "notice-title";
       title.contentEditable = true;
       title.textContent = notice.Title;
-
+  
       const desc = document.createElement("div");
       desc.className = "notice-desc";
       desc.contentEditable = true;
       desc.textContent = notice.Description;
-
+  
       const time = document.createElement("div");
       time.className = "notice-time";
       time.textContent = `Posted on: ${new Date(notice.Timestamp).toLocaleString()}`;
-
+  
       const buttons = document.createElement("div");
       buttons.className = "edit-delete-buttons";
-
+  
       const editBtn = document.createElement("button");
       editBtn.className = "edit-button";
       editBtn.textContent = "Save Changes";
       editBtn.onclick = () => saveChanges(key, title.textContent, desc.textContent);
-
+  
       const delBtn = document.createElement("button");
       delBtn.className = "delete-button";
       delBtn.textContent = "Delete";
       delBtn.onclick = () => confirmDelete(key);
-
+  
       buttons.append(editBtn, delBtn);
       container.append(title, desc, time);
       if (notice.PDFUrl) {
@@ -477,21 +485,21 @@
       container.append(buttons);
       document.getElementById("notices-list").appendChild(container);
     }
-
+  
     function saveChanges(key, newTitle, newDesc) {
       update(ref(db, "notice/" + key), {
         Title: newTitle,
         Description: newDesc
       }).then(() => displayNotices());
     }
-
+  
     function confirmDelete(key) {
       if (confirm("Are you sure you want to delete this notice?")) {
         remove(ref(db, "notice/" + key)).then(() => displayNotices());
       }
     }
-
+  
     document.getElementById("upload-button").addEventListener("click", uploadNotice);
   </script>
-</body>
+  </body>
 </html>
