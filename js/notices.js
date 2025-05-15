@@ -55,7 +55,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebas
         <div class="notice-title">${notice.Title}</div>
         <div class="notice-desc">${notice.Description}</div>
         <div class="notice-time">Posted on: ${new Date(notice.Timestamp).toLocaleString()}</div>
-        ${notice.PDFUrl ? `<a href="${notice.PDFUrl}" target="_blank" class="pdf-button">Download PDF</a>` : ''}
+        ${notice.PDFUrl ? `<a href="${notice.PDFUrl}" target="_blank" class="pdf-button">Download</a>` : ''}
       `;
       noticesList.appendChild(container);
     });
